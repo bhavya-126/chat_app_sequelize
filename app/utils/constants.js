@@ -117,7 +117,7 @@ CONSTANTS.SOCKET_EVENTS = {
     CONNECTION:'connection',
     JOIN_ROOM: 'joinRoom',
     LEAVE_ROOM: 'leaveRoom',
-    SEND_MESSAGE: 'sendMessage'
+    MESSAGE: 'message'
 };
 
 CONSTANTS.PAGINATION = {

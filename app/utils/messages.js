@@ -46,5 +46,8 @@ module.exports = {
         SOCKET_IS_RUNNING_FINE: 'Socket is running fine',
         MESSAGE_SENT: 'Message sent successfully',
         MESSAGE_READ: 'Message read updated Successfully',
+        ROOM_JOINED: 'Room joined',
+        ROOM_NOT_FOUND: 'Room not found.',
+        ROOM_LEFT: 'Room leaved'
     },
 };
