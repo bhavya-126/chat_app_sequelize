@@ -20,17 +20,19 @@ module.exports = function (connection) {
             type: DataTypes.STRING,
             allowNull: false
         },
-        isVerified: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
-        isDeleted: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
     }, {
         timestamps: true
     });
+
+    user.associate = (models) => {
+        user.hasMany(models.sessionModel, {
+            foreignKey: {
+              name: 'userId',
+              allowNull: false, 
+              onDelete: 'CASCADE', 
+            },
+          });  
+    }
 
     return user;
 };
