@@ -15,6 +15,7 @@ module.exports = {
     FORBIDDEN: 'Unrestricted access!',
     LOGGED_IN_SUCCESSFULLY: 'Logged in successfully.',
     USER_ALREADY_EXISTS: 'A user with this email or wallet address already exists.',
+    USER_DELETED: 'User deleted successfully..',
     EMAIL_ALREADY_EXISTS: 'Email already exists.',
     WALLET_ADDRESS_EXISTS: 'Wallet address already used by another account.',
     WALLET_ADDRESS_NOT_EXISTS: 'Wallet address does not exists.',
