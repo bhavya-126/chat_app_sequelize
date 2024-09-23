@@ -10,89 +10,39 @@ const {
     MESSAGES, ERROR_TYPES, NORMAL_PROJECTION, TOKEN_TYPES
 } = require('../utils/constants');
 const CONSTANTS = require('../utils/constants');
+const commonFunctions = require('../utils/utils');
+// const { userServices, sessionServices } = require('./index');
+const userServices = require('./userService')
+const sessionService = require('./sessionService')
+const helpers = require('../helpers');
 
 
 const authService = {};
-
-// authService.validateUser(request, response, next){
-
-// }
-
-authService.validateApiKey = () => (request, response, next) => {
-    if (request.headers['x-api-key'] === API_AUTH_KEY) {
-        return next();
-    }
-    const responseObject = createErrorResponse(MESSAGES.UNAUTHORIZED, ERROR_TYPES.UNAUTHORIZED);
-    return response.status(responseObject.statusCode).json(responseObject);
-};
 
 /**
  * function to validate user's token and fetch its details from the system.
  * @param {} request
  */
-const validateUser = async (request, authType) => {
+authService.validateUser = () => async (req, res, next) =>  {
     try {
-        if (authType == CONSTANTS.AVAILABLE_AUTHS.SERVER) {
-            if (CONFIG.API_KEY === '') {
-                return true;
-            } else {
-                if (!request.headers.hasOwnProperty('x-api-key') || !request.headers['x-api-key']) {
-                    return false;
-                }
-                if (request.headers['x-api-key'] === CONFIG.API_KEY) {
-                    return true;
-                }
-            }
-        } else {
-            let user;
-            let session = await sessionModel.findOne({ token: (request.headers.authorization), tokenType: TOKEN_TYPES.LOGIN }).lean();
-            if (!session) {
-                return false;
-            }
+        let token = req.headers.authorization;
+        let result = commonFunctions.decryptJwt(token);
 
-            if (session.role === CONSTANTS.USER_ROLES.USER) {
-                user = await userModel.findOne({ _id: session.userId }).lean();
-            }
+        let user = await userServices.findOne({ where: { id: result.id } });
 
-            if (user) {
-                user.session = session;
-                request.user = user;
-                return true;
-            }
-        }
-        return false;
+        if(!user) throw Error(MESSAGES.UNAUTHORIZED);
 
+        let checkToken = await sessionServices.findOne({where: {token, userId: user.id}});
+
+        if(!checkToken) throw Error(MESSAGES.UNAUTHORIZED);
+
+        req.user = user;
+
+        next();
     } catch (err) {
-        return false;
+        return res.status(401).json(helpers.createErrorResponse(MESSAGES.UNAUTHORIZED, ERROR_TYPES.UNAUTHORIZED));
     }
 };
-
-/**
- * function to authenticate user.
- */
-authService.userValidate = (authType) => {
-    return (request, response, next) => {
-        validateUser(request, authType).then((isAuthorized) => {
-            if (request.user && !request.user.isActive) {
-                const responseObject = createErrorResponse(MESSAGES.FORBIDDEN, ERROR_TYPES.FORBIDDEN);
-                return response.status(responseObject.statusCode).json(responseObject);
-            }
-            if (typeof (isAuthorized) === 'string') {
-                const responseObject = createErrorResponse(MESSAGES.FORBIDDEN(request.method, request.url), ERROR_TYPES.FORBIDDEN);
-                return response.status(responseObject.statusCode).json(responseObject);
-            }
-            if (isAuthorized) {
-                return next();
-            }
-            const responseObject = createErrorResponse(MESSAGES.UNAUTHORIZED, ERROR_TYPES.UNAUTHORIZED);
-            return response.status(responseObject.statusCode).json(responseObject);
-        }).catch(() => {
-            const responseObject = createErrorResponse(MESSAGES.UNAUTHORIZED, ERROR_TYPES.UNAUTHORIZED);
-            return response.status(responseObject.statusCode).json(responseObject);
-        });
-    }
-};
-
 
 /*
  * function to authenticate socket token
