@@ -25,7 +25,8 @@ module.exports = function (connection) {
             defaultValue: false
         }
     }, {
-        timestamps: true
+        timestamps: true,
+        paranoid: true,
     });
 
     user.associate = (models) => {
