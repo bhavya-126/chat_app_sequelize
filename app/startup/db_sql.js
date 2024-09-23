@@ -6,6 +6,7 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: process.env.DB_DIALECT,
+    logging: false
 })
 
 module.exports = async () => {
@@ -14,10 +15,12 @@ module.exports = async () => {
     for (let key in models) {
         let model = models[key](sequelize)
 
-        if (models[key].associate) models[key].associate(models)
+        if (models[key].associate) 
+            models[key].associate(models)
+
         models[key] = model;
     }
 
-    await sequelize.sync({})
+    await sequelize.sync({alter: true})
     console.log(`Connection to postgres has been established successfully`);
 }
