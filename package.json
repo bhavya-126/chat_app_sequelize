@@ -29,6 +29,7 @@
         "pino": "^7.6.5",
         "pino-logflare": "^0.3.12",
         "sequelize": "^6.37.3",
+        "socket.io": "^4.8.0",
         "swagger-ui-express": "^4.0.1"
     },
     "devDependencies": {

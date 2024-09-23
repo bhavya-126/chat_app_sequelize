@@ -45,7 +45,7 @@ routeUtils.route = async (app, routes = []) => {
         //     middlewares.push(SERVICES.authService.validateApiKey());
         // }
         if (route.auth) {
-            middlewares.push(SERVICES.authService.userValidate(route.auth));
+            middlewares.push(SERVICES.authService.validateUser());
         }
         app.route(route.path)[route.method.toLowerCase()](...middlewares, getHandlerMethod(route));
     });

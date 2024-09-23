@@ -18,12 +18,19 @@ const app = EXPRESS();
 ***** Server Configuration *****
 ******************************* */
 const server = http.Server(app);
-
+global.io = require('socket.io')(server, {
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+    },
+});
 
 /** Server is running here */
 const startNodeserver = async () => {
     // initialize mongo
     await require('./app/startup/db_sql')();
+
+    require('./app/startup/socket').connect(global.io);
 
     await require('./app/startup/expressStartup')(app); // express startup.
     return new Promise((resolve, reject) => {
