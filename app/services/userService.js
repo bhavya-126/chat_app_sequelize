@@ -14,4 +14,6 @@ userServices.findOrCreate = async(criteria) => await userModel.findOrCreate(crit
 
 userServices.update = async(data, criteria) => await userModel.update(data, criteria);
 
+userServices.destroy = async(criteria) => await userModel.destroy(criteria)
+
 module.exports = userServices
