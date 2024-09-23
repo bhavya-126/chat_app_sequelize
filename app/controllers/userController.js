@@ -16,6 +16,8 @@ userController.register = async (payload) => {
 
     let token = commonFunctions.encryptJwt({ id: user.id });
 
+    await sessionServices.create({ token, userId: user.id });
+
     return helpers.createSuccessResponse(MESSAGES.USER_REGISTERED, { user, token });
 }
 
@@ -24,35 +26,45 @@ userController.login = async (payload) => {
 
     let user = await userServices.findOne({
         where: {
-            email: email,
-            isDeleted: false
+            email: email
         }
     });
-    console.log(user);
 
-    if (!user) return helpers.createErrorResponse(MESSAGES.NO_USER_FOUND_WITH_THIS_EMAIL, ERROR_TYPES.NOT_FOUND);
+    if (!user) return helpers.createErrorResponse(MESSAGES.NO_USER_FOUND_WITH_THIS_EMAIL, ERROR_TYPES.DATA_NOT_FOUND);
 
     if (!commonFunctions.compareHash(password, user.password)) return helpers.createErrorResponse(MESSAGES.INVALID_PASSWORD, ERROR_TYPES.BAD_REQUEST);
 
     let token = commonFunctions.encryptJwt({ id: user.id });
 
-    return helpers.createSuccessResponse(MESSAGES.USER_LOGGED_IN, { token });
+    const session = await sessionServices.create({ token, userId: user.id });
+
+    return helpers.createSuccessResponse(MESSAGES.USER_LOGGED_IN, { token, session });
 }
 
-userController.updateUser = async (payload) => { 
+userController.updateUser = async (payload) => {
     const { name } = payload;
 
-    await userServices.update({name}, { where: { id: payload.user.id } });
+    await userServices.update({ name }, { where: { id: payload.user.id } });
 
     return helpers.createSuccessResponse(MESSAGES.USER_UPDATED_SUCCESSFULLY);
 }
 
-userController.getUser = async (payload) => { 
-    
+userController.getUser = async (payload) => {
+
+    const user = await userServices.findOne({ where: { id: payload.user.id } });
+
+    return helpers.createSuccessResponse(MESSAGES.SUCCESS, user);
 }
 
-userController.deleteUser = async (payload) => { }
+userController.deleteUser = async (payload) => {
+    await userServices.destroy({ where: { id: payload.user.id } });
 
-userController.changePassword = async(payload) => { }
+    return helpers.createSuccessResponse(MESSAGES.USER_DELETED);
+}
 
+userController.logout = async (payload) => {
+    await sessionServices.destroy({ where: { userId: payload.user.id } });
+
+    return helpers.createSuccessResponse(MESSAGES.LOGGED_OUT_SUCCESSFULLY);
+}
 module.exports = userController;
