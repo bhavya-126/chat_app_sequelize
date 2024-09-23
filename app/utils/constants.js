@@ -114,6 +114,10 @@ CONSTANTS.REDIS_EXPIRE_TIME_IN_SEC = 10800;
 CONSTANTS.SOCKET_EVENTS = {
     TEST: 'test',
     DISCONNECT: 'disconnect',
+    CONNECTION:'connection',
+    JOIN_ROOM: 'joinRoom',
+    LEAVE_ROOM: 'leaveRoom',
+    SEND_MESSAGE: 'sendMessage'
 };
 
 CONSTANTS.PAGINATION = {
