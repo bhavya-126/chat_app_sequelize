@@ -10,5 +10,8 @@ module.exports = {
     authService: require('./authService'),
     fileUploadService: require('./fileUploadService'),
     sessionServices: require('./sessionService'),
-    userServices: require('./userService')
+    userServices: require('./userService'),
+    roomService: require('./roomService'),
+    roomDetailsService: require('./roomDetailsService'),
+    chatService: require('./chatService'),
 };
