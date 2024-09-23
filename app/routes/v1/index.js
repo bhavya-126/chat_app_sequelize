@@ -4,7 +4,8 @@
  ********* Import All routes ***********
  ******************************* */
 const v1Routes = [
-  ...require('./serverRoutes')
+  ...require('./serverRoutes'),
+  ...require('./userRoutes')
 ];
 
 module.exports = v1Routes;
