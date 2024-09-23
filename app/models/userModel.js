@@ -20,6 +20,10 @@ module.exports = function (connection) {
             type: DataTypes.STRING,
             allowNull: false
         },
+        active: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        }
     }, {
         timestamps: true
     });

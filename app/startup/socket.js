@@ -10,6 +10,8 @@ socketConnection.connect = (io) => {
   io.on(SOCKET_EVENTS.CONNECTION, async (socket) => {
     console.log('connection established: ', socket.id);
 
+    await userServices.update( {active: true}, { where: {id: socket.userId}})
+
     socket.use(async (packet, next) => {
       console.log('Socket hit:=>', packet);
       try {
@@ -25,6 +27,7 @@ socketConnection.connect = (io) => {
     });
 
     socket.on(SOCKET_EVENTS.DISCONNECT, async () => {
+      await userServices.update( {active: false}, { where: {id: socket.userId}})
       console.log('Disconnected socket id: ', socket.id);
     });
   });
