@@ -10,6 +10,8 @@ userServices.findAll = async(criteria) => await userModel.findAll(criteria)
 
 userServices.findByPk = async(id) => await userModel.findByPk(id)
 
-userServices.findOrCreate = async(criteria) => await userModel.findOrCreate(criteria)
+userServices.findOrCreate = async(criteria) => await userModel.findOrCreate(criteria);
+
+userServices.update = async(data, criteria) => await userModel.update(data, criteria);
 
 module.exports = userServices
