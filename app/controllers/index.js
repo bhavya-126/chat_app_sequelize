@@ -7,5 +7,6 @@
 
 module.exports = {
     serverController: require('./serverController'),
-    userController: require('./userController')
+    userController: require('./userController'),
+    chatController: require('./chatController')
 };
