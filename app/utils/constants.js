@@ -49,6 +49,7 @@ CONSTANTS.PASSWORD_PATTER_REGEX = /^(?=.{6,})(?=.*[a-z])(?=.*[0-9])(?=.*[A-Z])(?
 
 CONSTANTS.NAME_REGEX = /^[a-zA-Z\s]{1,20}[a-zA-Z\s]$/;
 CONSTANTS.PHONE_REGEX = /^\+\d{1,3}\d{8,10}$/;
+CONSTANTS.EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 CONSTANTS.ETHEREUM_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 
 CONSTANTS.NORMAL_PROJECTION = {
