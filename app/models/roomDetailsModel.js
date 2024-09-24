@@ -24,7 +24,8 @@ module.exports = function (Sequelize) {
             allowNull: false,
         },
     }, {
-        timestamps: true
+        timestamps: true,
+        tableName: "roomDetails"
     });
 
     roomDetails.associate = (models) => {
