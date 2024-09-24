@@ -28,11 +28,11 @@ global.io = require('socket.io')(server, {
 /** Server is running here */
 const startNodeserver = async () => {
     // initialize mongo
-    await require('./app/startup/db_sql')();
+    let sequelize = await require('./app/startup/db_sql')();
 
-    require('./app/startup/socket').connect(global.io);
+    require('./app/startup/socket').connect(global.io, sequelize);
 
-    await require('./app/startup/expressStartup')(app); // express startup.
+    await require('./app/startup/expressStartup')(app, sequelize); // express startup.
     return new Promise((resolve, reject) => {
         server.listen(SERVER.PORT, (err) => {
             if (err) reject(err);

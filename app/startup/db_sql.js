@@ -23,4 +23,5 @@ module.exports = async () => {
 
     await sequelize.sync({alter: true})
     console.log(`Connection to postgres has been established successfully`);
+    return sequelize;
 }

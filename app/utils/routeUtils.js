@@ -33,7 +33,7 @@ const routeUtils = {};
 /**
 * function to create routes in the express.
 */
-routeUtils.route = async (app, routes = []) => {
+routeUtils.route = async (app, sequelize, routes = []) => {
     routes.forEach((route) => {
         let middlewares = [];
         if (route.joiSchemaForSwagger.formData) {
@@ -47,7 +47,7 @@ routeUtils.route = async (app, routes = []) => {
         if (route.auth) {
             middlewares.push(SERVICES.authService.validateUser());
         }
-        app.route(route.path)[route.method.toLowerCase()](...middlewares, getHandlerMethod(route));
+        app.route(route.path)[route.method.toLowerCase()](...middlewares, getHandlerMethod(route, sequelize));
     });
     createSwaggerUIForRoutes(app, routes);
 };
@@ -177,7 +177,7 @@ let getMulterMiddleware = (formData) => (req, res, next) => {
 * middleware
 * @param {*} handler
 */
-let getHandlerMethod = (route) => {
+let getHandlerMethod = (route, sequelize) => {
     const { handler } = route;
     return (request, response) => {
         let payload = {
@@ -187,6 +187,7 @@ let getHandlerMethod = (route) => {
             range: request.headers.range,
             file: (request.file || {}),
             user: (request.user ? request.user : {}),
+            sequelize: sequelize
         };
         // request handler/controller
         if (route.getExactRequest) {

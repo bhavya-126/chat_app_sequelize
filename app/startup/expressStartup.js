@@ -11,7 +11,7 @@ const routeUtils = require('../utils/routeUtils');
 const { log, logger } = require('../utils/utils');
 const { migerateDatabase } = require('../utils/dbMigrations');
 
-module.exports = async (app) => {
+module.exports = async (app, sequelize) => {
     app.use(cors());
     app.use(require('body-parser').json({ limit: '50mb' }));
     app.use(require('body-parser').urlencoded({ limit: '50mb', extended: true }));
@@ -64,5 +64,5 @@ module.exports = async (app) => {
     });
 
     // await migerateDatabase(); // run database migrations.
-    await routeUtils.route(app, routes); // initalize routes.
+    await routeUtils.route(app, sequelize, routes, ); // initalize routes.
 };
