@@ -5,6 +5,7 @@ module.exports = [
     {
         method: 'GET',
         path: '/api/chat',
+        auth: true,
         joiSchemaForSwagger: {
             group: 'Chat',
             description: 'Get all chats',
@@ -19,5 +20,33 @@ module.exports = [
             }
         },
         handler: chatController.getChat
+    },
+    {
+        method: "GET",
+        path: 'api/chat/users',
+        auth: true,
+        joiSchemaForSwagger: {
+            group: 'Chat',
+            description: 'Get all users',
+            model: 'Chat',
+            headers: {
+                authorization: Joi.string().required()
+            }
+        },
+        handler: chatController.getUsers
+    },
+    {
+        method: "GET",
+        path: 'api/chat/groups',
+        auth: true,
+        joiSchemaForSwagger: {
+            group: 'Chat',
+            description: 'Get all groups',
+            model: 'Chat',
+            headers: {
+                authorization: Joi.string().required()
+            }
+        },
+        handler: chatController.getGroups
     }
 ]
