@@ -28,11 +28,10 @@ chatListner.joinRoom = async (socket, payload, callback) => {
     let { roomId } = payload
 
     let room = await roomService.findOne({ where: { id: roomId } })
+    if (!room) await roomService.create({id: roomId});
 
-    if (!room) {
-        if (typeof callback === 'function') callback({ success: false, message: MESSAGES.SOCKET.ROOM_NOT_FOUND })
-        return
-    }
+    let roomDetails = await roomDetailsService.findOne({where: {roomId, userId: socket.userId}});
+    if(!roomDetails) await roomDetailsService.create({roomId, userId: socket.userId});
 
     socket.join(room.id);
 
