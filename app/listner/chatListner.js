@@ -3,42 +3,42 @@ const { MESSAGES, SOCKET_EVENTS } = require("../utils/constants");
 
 const chatListner = {}
 
-// chatListner.createRoom = async (socket, payload, callback) => {
+chatListner.createGroup = async (socket, payload, callback) => {
+    payload = JSON.parse(payload)
 
-//     let { name, users, isGroup } = payload
+    let { name, users = [] } = payload;
 
-//     let roomData = { isGroup };
+    if (users.length < 1 && typeof callback === 'function')
+        return callback({ success: false, MESSAGE: MESSAGES.SOCKET.GROUP_MUST_HAVE_ATLEAST_ONE_USER })
 
-//     if (isGroup) roomData.name = name
-//     else roomData.id = [String(users[0].id), String(payload.userId)].sort((a, b) => a > b ? 1 : -1).join('-');
+    let roomData = { isGroup: true, name };
 
-//     let room = await roomService.create({ ...roomData });
+    let room = await roomService.create({ ...roomData });
 
-//     if (users && users.length > 0) {
-//         await roomDetailsService.create({ roomId: room.id, userId: socket.userId });
+    if (users && users.length > 0) {
+        let data = [{ roomId: room.id, userId: socket.userId }];
+        for (let user of users) data.push({ roomId: room.Id, userId: user })
 
-//         for (let user of users) await roomDetailsService.create({ roomId: room.Id, userId: user })
-//     }
-//     socket.join(room.id);
-
-//     if (typeof callback === 'function') callback({ success: true, roomId: room.id, message: MESSAGES.SOCKET.ROOM_JOINED })
-// }
-
-chatListner.joinRoom = async (socket, payload, callback) => {
-    let { roomId } = payload
-
-    let room = await roomService.findOne({ where: { id: roomId } })
-    if (!room) await roomService.create({id: roomId});
-
-    let roomDetails = await roomDetailsService.findOne({where: {roomId, userId: socket.userId}});
-    if(!roomDetails) await roomDetailsService.create({roomId, userId: socket.userId});
-
+        roomDetailsService.bulkCreate(data)
+    }
     socket.join(room.id);
 
     if (typeof callback === 'function') callback({ success: true, roomId: room.id, message: MESSAGES.SOCKET.ROOM_JOINED })
 }
 
+chatListner.joinRoom = async (socket, payload, callback) => {
+    payload = JSON.parse(payload)
+    let { userId } = payload;
+
+    let roomId = [userId, socket.userId].sort().join('-')
+
+    socket.join(roomId);
+
+    if (typeof callback === 'function') callback({ success: true, roomId: roomId, message: MESSAGES.SOCKET.ROOM_JOINED })
+}
+
 chatListner.leaveRoom = async (socket, payload, callback) => {
+    payload = JSON.parse(payload)
     let { roomId } = payload
 
     let room = await roomDetailsService.findOne({ where: { roomId: roomId, userId: socket.userId } })
@@ -56,18 +56,15 @@ chatListner.leaveRoom = async (socket, payload, callback) => {
 }
 
 chatListner.sendMessage = async (socket, payload, callback) => {
+    payload = JSON.parse(payload)
     let { roomId, message } = payload;
 
-    let room = await roomService.findOne({ where: { id: roomId } })
+    let messageData = await chatService.create({ roomId, message, senderId: socket.userId });
 
-    if(!room) {
-        if (typeof callback === 'function') callback({ success: false, message: MESSAGES.SOCKET.ROOM_NOT_FOUND })
-        return
-    }
+    socket.to(roomId).emit(SOCKET_EVENTS.MESSAGE, messageData);
+    socket.emit(SOCKET_EVENTS.MESSAGE, messageData)
 
-    let messageData = await chatService.create({roomId, message, senderId: socket.userId});
-
-    socket.to(room.id).emit(SOCKET_EVENTS.MESSAGE, messageData);
+    if (typeof callback === 'function') callback({ success: true, message: MESSAGES.SOCKET.MESSAGE_SENT })
 }
 
 
