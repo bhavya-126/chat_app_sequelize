@@ -14,20 +14,27 @@ socketConnection.connect = (io, sequelize) => {
 
     await userServices.update({ active: true }, { where: { id: socket.userId } })
 
-    let users = await userServices.findAll({raw: true});
-    let groups = await sequelize.query('SELECT "roomId" FROM "roomDetails" WHERE "userId" = :userId', {
-      type: QueryTypes.SELECT,
-      replacements: {
-        userId: socket.userId
-      }
-    })
-    
-    for( let user of users ) {
-      let room = [user.id, socket.userId].sort((a, b)=> a-b).join('-');
+    let users = await userServices.findAll({ raw: true });
+
+    for (let user of users) {
+      let room = [user.id, socket.userId].sort((a, b) => a - b).join('-');
       socket.join(room)
     }
 
-    for( let group of groups )  socket.join(group.roomId)
+    let groups = await sequelize.query(`SELECT "id" FROM "rooms" 
+      WHERE "isGroup" = :isGroup 
+        AND 
+      "id" IN ( SELECT "roomId" FROM "roomDetails" WHERE "userId" = :userId)`, {
+      type: QueryTypes.SELECT,
+      replacements: {
+        isGroup: true,
+        userId: socket.userId,
+      }
+    })
+
+    for (let group of groups) socket.join(group.id)
+
+    socket.on(SOCKET_EVENTS.CREATE_GROUP, async (payload, callback) => chatListner.createGroup(socket, payload, callback))
 
     socket.on(SOCKET_EVENTS.JOIN_ROOM, async (payload, callback) => chatListner.joinRoom(socket, payload, callback))
 
