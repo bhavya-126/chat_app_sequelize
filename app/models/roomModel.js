@@ -18,6 +18,10 @@ module.exports = function (Sequelize) {
         name: {
             type: DataTypes.STRING,
             allowNull: true
+        },
+        isGroup: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         }
     }, {
         timestamps: true
