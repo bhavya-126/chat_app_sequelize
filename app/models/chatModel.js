@@ -15,10 +15,10 @@ module.exports = function (Sequelize) {
             allowNull: false,
         },
         roomId: {
-            type: DataTypes.UUID,
+            type: DataTypes.STRING,
             allowNull: false,
         },
-        messages: {
+        message: {
             type: DataTypes.STRING,
             allowNull: false
         }
@@ -28,8 +28,7 @@ module.exports = function (Sequelize) {
     });
 
     chat.associate = (models) => {
-        chat.belongTo(models.userModel, { foreignKey: 'senderId', onDelete: 'NO ACTION', })
-        chat.belongTo(models.roomModel, { foreignKey: 'roomId', onDelete: 'CASCADE', })
+        // chat.belongTo(models.userModel, { foreignKey: 'senderId', onDelete: 'NO ACTION', })
     }
 
     return chat;
