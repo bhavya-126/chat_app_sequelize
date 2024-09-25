@@ -2,7 +2,7 @@
 /** -- import all modules */
 const { QueryTypes } = require('sequelize');
 const chatListner = require('../listner/chatListner');
-const { authService, userServices } = require('../services');
+const { authService, userServices, validateService } = require('../services');
 const { MESSAGES, SOCKET_EVENTS } = require('../utils/constants');
 
 const socketConnection = {};
@@ -12,12 +12,14 @@ socketConnection.connect = (io, sequelize) => {
   io.on(SOCKET_EVENTS.CONNECTION, async (socket) => {
     console.log('connection established: ', socket.id);
 
+    socket.use(validateService.validateSocketEvent)
+
     await userServices.update({ active: true }, { where: { id: socket.userId } })
 
     let users = await userServices.findAll({ raw: true });
 
     for (let user of users) {
-      let room = [user.id, socket.userId].sort((a, b) => a - b).join('-');
+      let room = [user.id, socket.userId].sort().join('-');
       socket.join(room)
     }
 

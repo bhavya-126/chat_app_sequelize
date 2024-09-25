@@ -14,4 +14,5 @@ module.exports = {
     roomService: require('./roomService'),
     roomDetailsService: require('./roomDetailsService'),
     chatService: require('./chatService'),
+    validateService: require('./validateService')
 };
