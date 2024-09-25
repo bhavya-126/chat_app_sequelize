@@ -4,6 +4,8 @@ roomDetailsService = {}
 
 roomDetailsService.create = async(data) => await roomDetailsModel.create(data)
 
+roomDetailsService.bulkCreate = async(data) => await roomDetailsModel.bulkCreate(data)
+
 roomDetailsService.findOne = async(criteria) => await roomDetailsModel.findOne(criteria)
 
 roomDetailsService.findAll = async(criteria) => await roomDetailsModel.findAll(criteria)
