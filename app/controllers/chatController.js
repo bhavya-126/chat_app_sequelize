@@ -35,62 +35,110 @@ chatController.getGroups = async (payload) => {
 
 chatController.getPreviouslyChatedUser = async (payload) => {
     let { sequelize } = payload
+    // let users = await sequelize.query(`
+    //     SELECT
+    //         "user"."id", 
+    //         "user"."name", 
+    //         "msg"."message", 
+    //         "msg"."createdAt"
+    //     FROM
+    //         "users" AS "user"
+    //     LEFT OUTER JOIN
+    //         (
+    //             SELECT 
+    //                 "c1"."roomId" AS "roomId", 
+    //                 "c1"."message" AS "message", 
+    //                 "c1"."createdAt" AS "createdAt"
+    //             FROM 
+    //                 "chats" AS "c1"
+    //             INNER JOIN 
+    //                 (
+    //                     SELECT 
+    //                         "roomId", 
+    //                         MAX("createdAt") AS "lastMsgTime"
+    //                     FROM 
+    //                         "chats"
+    //                     GROUP BY 
+    //                         "roomId"
+    //                 ) AS "c2" 
+    //             ON 
+    //                 "c1"."roomId" = "c2"."roomId" 
+    //                 AND "c1"."createdAt" = "c2"."lastMsgTime"
+    //         ) AS "msg" 
+    //     ON
+    //         "msg"."roomId" LIKE "user"."id" || '%'
+    //     WHERE
+    //         "msg"."roomId" LIKE '%' || "user"."id"
+    // `, {
+    //     type: QueryTypes.SELECT,
+    //     replacements: {
+    //         userId: payload.user.id
+    //     }
+    // });
+
     let users = await sequelize.query(`
-    SELECT 
-        "user"."id" AS "id", 
-        "user"."name" AS "name", 
-        "user"."active" AS "isActive", 
-        "msg"."message" AS "lastMessage", 
-        "msg"."createdBy" AS "lastMsgTime" 
-    FROM 
-        (
-            SELECT 
-                "users"."id" AS "id", 
-                "users"."name" AS "name", 
-                "users"."active" AS "active", 
-                "rooms"."id" 
-            FROM 
-                "users", 
-                "rooms", 
-                ( 
-                    SELECT 
-                        "roomId", 
-                        "userId" 
-                    FROM 
-                        "roomDetails"
-                    WHERE 
-                        "roomId" IN ( SELECT "roomId" FROM "roomDetails" WHERE "userId" = :userId )
-                ) AS rDetails 
-            WHERE 
-                "rDetails"."roomId" = "rooms"."id" 
-                    AND 
-                "users"."id" = "rDetails"."userId"
-        ) AS "user", 
-        (
-            SELECT 
-                "c1".* 
-            FROM 
-                "chats" AS "c1" 
-                    INNER JOIN 
-                (
-                    SELECT 
-                        "roomId", 
-                        MAX("createdAt") AS "lastMsgTime" 
-                    FROM 
-                        "chats" 
-                    GROUP BY 
-                        "roomId"
-                ) AS "c2"
-            ON 
-                "c1"."roomId" = "c2"."roomId" 
-                    AND 
-                "c1"."createdAt" = "c2"."lastMsgTime"
-        ) AS "msg"`, {
+        SELECT
+            "user"."id",
+            "user"."name" AS userName,
+            "user"."active" AS "isActive",
+            "msg"."roomId",
+            "msg"."message",
+            "msg"."createdAt",
+            "room"."name" AS "roomName"
+        FROM
+            "users" AS "user"
+        RIGHT OUTER JOIN
+            (
+                SELECT 
+                    "c1"."roomId", 
+                    "c1"."message", 
+                    "c1"."createdAt"
+                FROM 
+                    "chats" AS "c1"
+                INNER JOIN 
+                    (
+                        SELECT 
+                            "roomId", 
+                            MAX("createdAt") AS "lastMsgTime"
+                        FROM 
+                            "chats" 
+                        GROUP BY 
+                            "roomId"
+                    ) AS "c2" 
+                ON 
+                    "c1"."roomId" = "c2"."roomId" 
+                    AND "c1"."createdAt" = "c2"."lastMsgTime"
+            ) AS "msg"
+        ON
+            "msg"."roomId" LIKE ( "user"."id" || '-' || :userId )
+                OR
+            "msg"."roomId" LIKE ( :userId || '-' || "user"."id" )
+        LEFT OUTER JOIN 
+            (
+                SELECT 
+                    "room"."name",
+                    "room"."id"
+                FROM
+                    "rooms" AS "room"
+                WHERE
+                    "room"."id" IN (
+                        SELECT 
+                            "roomId"
+                        FROM 
+                            "roomDetails"
+                        WHERE 
+                            "userId" = :userId
+                    )
+            ) AS "room"
+        ON
+            "room"."id"::text = "msg"."roomId"
+    `, {
         type: QueryTypes.SELECT,
         replacements: {
             userId: payload.user.id
         }
-    });
+    })
+
 
     return helpers.createSuccessResponse(MESSAGES.SUCCESS, users)
 }
