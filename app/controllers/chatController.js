@@ -1,4 +1,6 @@
+const { QueryTypes } = require("sequelize");
 const helpers = require("../helpers");
+const { chatService } = require("../services");
 const { MESSAGES, ERROR_TYPES } = require("../utils/constants");
 
 const chatController = {}
@@ -6,11 +8,7 @@ const chatController = {}
 chatController.getChat = async (payload) => {
     const { roomId, limit, totalCount } = payload;
 
-    const room = await roomService.findByPk(roomId);
-
-    if (!room) return helpers.createErrorResponse(MESSAGES.SOCKET.ROOM_NOT_FOUND, ERROR_TYPES.DATA_NOT_FOUND);
-
-    let chat = await chatServices.findAll({ where: { roomId }, limit, offset: totalCount })
+    let chat = await chatService.findAll({ where: { roomId }, limit, offset: totalCount })
 
     return helpers.createSuccessResponse(MESSAGES.SUCCESS, chat)
 }
@@ -35,8 +33,9 @@ chatController.getGroups = async (payload) => {
     return helpers.createSuccessResponse(MESSAGES.SUCCESS, groups);
 }
 
-chatController.getPreviouslyChatedUser = (payload) => {
-    let users = sequelize.query(`
+chatController.getPreviouslyChatedUser = async (payload) => {
+    let { sequelize } = payload
+    let users = await sequelize.query(`
     SELECT 
         "user"."id" AS "id", 
         "user"."name" AS "name", 
@@ -89,11 +88,11 @@ chatController.getPreviouslyChatedUser = (payload) => {
         ) AS "msg"`, {
         type: QueryTypes.SELECT,
         replacements: {
-            userId: payload.user.id 
+            userId: payload.user.id
         }
     });
 
     return helpers.createSuccessResponse(MESSAGES.SUCCESS, users)
 }
-                     
+
 module.exports = chatController

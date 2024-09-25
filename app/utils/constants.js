@@ -115,6 +115,7 @@ CONSTANTS.SOCKET_EVENTS = {
     TEST: 'test',
     DISCONNECT: 'disconnect',
     CONNECTION:'connection',
+    CREATE_GROUP: 'createGroup',
     JOIN_ROOM: 'joinRoom',
     LEAVE_ROOM: 'leaveRoom',
     MESSAGE: 'message'

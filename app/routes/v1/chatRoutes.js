@@ -23,7 +23,7 @@ module.exports = [
     },
     {
         method: "GET",
-        path: 'api/chat/users',
+        path: '/api/chat/users',
         auth: true,
         joiSchemaForSwagger: {
             group: 'Chat',
@@ -37,7 +37,7 @@ module.exports = [
     },
     {
         method: "GET",
-        path: 'api/chat/groups',
+        path: '/api/chat/groups',
         auth: true,
         joiSchemaForSwagger: {
             group: 'Chat',
@@ -48,5 +48,19 @@ module.exports = [
             }
         },
         handler: chatController.getGroups
+    },
+    {
+        method: "GET",
+        path: '/api/chat/previous/users',
+        auth: true,
+        joiSchemaForSwagger: {
+            group: 'Chat',
+            description: 'Get all previously chated users',
+            model: 'Chat',
+            headers: {
+                authorization: Joi.string().required()
+            }
+        },
+        handler: chatController.getPreviouslyChatedUser
     }
 ]

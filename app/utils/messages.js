@@ -48,6 +48,7 @@ module.exports = {
         MESSAGE_READ: 'Message read updated Successfully',
         ROOM_JOINED: 'Room joined',
         ROOM_NOT_FOUND: 'Room not found.',
-        ROOM_LEFT: 'Room leaved'
+        ROOM_LEFT: 'Room leaved',
+        GROUP_MUST_HAVE_ATLEAST_ONE_USER: 'Group must have atleast one user'
     },
 };
